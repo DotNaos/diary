@@ -1,0 +1,29 @@
+---
+import { formatCompactDate } from '../lib/date';
+import { bucketLabels, getKindLabel, type Bucket } from '../lib/taxonomy';
+
+interface Props {
+	href: string;
+	title: string;
+	summary: string;
+	date: Date;
+	bucket: Bucket;
+	kind: string;
+}
+
+const { href, title, summary, date, bucket, kind } = Astro.props;
+---
+
+<a href={href} class="entry-row">
+	<div class="entry-row-meta">
+		<span class="mini-label">{bucketLabels[bucket]}</span>
+		<span class="status-pill">{getKindLabel(bucket, kind)}</span>
+	</div>
+
+	<div class="entry-row-copy">
+		<h3>{title}</h3>
+		<p>{summary}</p>
+	</div>
+
+	<time datetime={date.toISOString()}>{formatCompactDate(date)}</time>
+</a>

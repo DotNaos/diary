@@ -1,0 +1,56 @@
+---
+import EntryRow from '../../components/EntryRow.astro';
+import Layout from '../../layouts/Layout.astro';
+import { getLibraryPreviews } from '../../lib/content';
+import { libraryKindLabels } from '../../lib/taxonomy';
+
+const entries = await getLibraryPreviews();
+
+const sections = (['insight', 'idea', 'life', 'journal'] as const)
+	.map((kind) => ({
+		kind,
+		label: libraryKindLabels[kind],
+		items: entries.filter((entry) => entry.kind === kind),
+	}))
+	.filter((section) => section.items.length > 0);
+---
+
+<Layout
+	title="Bibliothek"
+	description="Sortierte Einträge, Erkenntnisse, Projektgedanken und längere Notizen."
+	active="library"
+>
+	<section class="page-hero">
+		<p class="eyebrow">Bibliothek</p>
+		<h1>Alles, was schon eine Form gefunden hat.</h1>
+		<p>
+			Hier liegen die Stücke, die lesbar genug geworden sind, um wiedergefunden zu werden:
+			Erkenntnisse, Ideen, Lebensnotizen und kleine Tagebuchspuren.
+		</p>
+	</section>
+
+	{
+		sections.map((section) => (
+			<section class="section-block">
+				<div class="section-head">
+					<h2>{section.label}</h2>
+				</div>
+
+				<div class="row-list">
+					{
+						section.items.map((entry) => (
+							<EntryRow
+								href={entry.href}
+								title={entry.title}
+								summary={entry.summary}
+								date={entry.created}
+								bucket={entry.bucket}
+								kind={entry.kind}
+							/>
+						))
+					}
+				</div>
+			</section>
+		))
+	}
+</Layout>

@@ -1,23 +1,90 @@
+---
+import AgentationToolbar from '../components/AgentationToolbar';
+import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+	active?: 'home' | 'library' | 'inbox' | 'system';
+}
+
+const {
+	title = 'Diary',
+	description = 'Eine ruhige Bibliothek aus Notizen, Erkenntnissen, Projektideen und rohen Gedanken.',
+	active = 'home',
+} = Astro.props;
+
+const pageTitle = title === 'Diary' ? title : `${title} · Diary`;
+
+const navigation = [
+	{ href: '/', label: 'Start', key: 'home' },
+	{ href: '/library/', label: 'Bibliothek', key: 'library' },
+	{ href: '/inbox/', label: 'Inbox', key: 'inbox' },
+	{ href: '/system/', label: 'System', key: 'system' },
+] as const;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="de">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="description" content={description} />
+		<title>{pageTitle}</title>
 	</head>
 	<body>
-		<slot />
+		<div class="page-surface">
+			<div class="app-shell">
+				<aside class="sidebar">
+					<a class="brand sidebar-brand" href="/">
+						<span class="brand-mark">D</span>
+						<span>
+							<strong>Diary</strong>
+							<small>markdown library</small>
+						</span>
+					</a>
+
+					<nav class="sidebar-nav" aria-label="Hauptnavigation">
+						{
+							navigation.map((item) => (
+								<a
+									href={item.href}
+									class:list={['sidebar-link', active === item.key && 'is-active']}
+								>
+									{item.label}
+								</a>
+							))
+						}
+					</nav>
+
+					<div class="sidebar-note">
+						<p class="eyebrow">Markdown</p>
+						<code>src/content/inbox</code>
+						<code>src/content/library</code>
+					</div>
+				</aside>
+
+				<div class="content-shell">
+					<main class="page-content">
+						<slot />
+					</main>
+
+					<footer class="footer-note">
+						<p>GitHub ist das Regal. Astro ist nur die ruhige Leseschicht darüber.</p>
+					</footer>
+				</div>
+			</div>
+
+			<AgentationToolbar client:only="react" />
+		</div>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

@@ -1,0 +1,79 @@
+---
+import { getCollection, render } from 'astro:content';
+
+import EntryCard from '../../components/EntryCard.astro';
+import Layout from '../../layouts/Layout.astro';
+import { formatLongDate } from '../../lib/date';
+import { getLibraryPreviews } from '../../lib/content';
+import { bucketLabels, getKindLabel } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('library');
+	return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const allEntries = await getLibraryPreviews();
+
+const related = allEntries
+	.filter((candidate) => candidate.slug !== entry.id)
+	.filter((candidate) => candidate.tags.some((tag) => entry.data.tags.includes(tag)))
+	.slice(0, 3);
+---
+
+<Layout title={entry.data.title} description={entry.data.summary} active="library">
+	<article class="post-shell">
+		<a class="back-link" href="/library/">Zurück zur Bibliothek</a>
+
+		<header class="post-header">
+			<div class="entry-card-head">
+				<span class="mini-label">{bucketLabels.library}</span>
+				<span class="status-pill">{getKindLabel('library', entry.data.kind)}</span>
+			</div>
+
+			<h1>{entry.data.title}</h1>
+			<p class="post-summary">{entry.data.summary}</p>
+
+			<div class="post-meta">
+				<time datetime={entry.data.created.toISOString()}>{formatLongDate(entry.data.created)}</time>
+				<div class="tag-row">
+					{entry.data.tags.map((tag) => <span class="tag-chip">#{tag}</span>)}
+				</div>
+			</div>
+		</header>
+
+		<div class="rich-copy">
+			<Content />
+		</div>
+	</article>
+
+	{
+		related.length > 0 && (
+			<section class="section-block">
+				<div class="section-head">
+					<div>
+						<p class="eyebrow">Verwandte Stücke</p>
+						<h2>Mehr aus derselben Gegend.</h2>
+					</div>
+				</div>
+
+				<div class="card-grid">
+					{
+						related.map((item) => (
+							<EntryCard
+								href={item.href}
+								title={item.title}
+								summary={item.summary}
+								date={item.created}
+								tags={item.tags}
+								bucket={item.bucket}
+								kind={item.kind}
+							/>
+						))
+					}
+				</div>
+			</section>
+		)
+	}
+</Layout>

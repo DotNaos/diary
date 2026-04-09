@@ -1,0 +1,56 @@
+---
+import EntryRow from '../../components/EntryRow.astro';
+import Layout from '../../layouts/Layout.astro';
+import { getInboxPreviews } from '../../lib/content';
+import { inboxKindLabels } from '../../lib/taxonomy';
+
+const entries = await getInboxPreviews();
+
+const sections = (['spark', 'fragment', 'question', 'seed'] as const)
+	.map((kind) => ({
+		kind,
+		label: inboxKindLabels[kind],
+		items: entries.filter((entry) => entry.kind === kind),
+	}))
+	.filter((section) => section.items.length > 0);
+---
+
+<Layout
+	title="Inbox"
+	description="Rohes Material, frühe Gedanken, Fragen und halbe Funde."
+	active="inbox"
+>
+	<section class="page-hero">
+		<p class="eyebrow">Inbox</p>
+		<h1>Hier darf es unfertig bleiben.</h1>
+		<p>
+			Die Inbox ist kein Archiv, sondern die Oberfläche für Material im Rohzustand. Eher
+			Zettelkasten als fertiges Notizbuch.
+		</p>
+	</section>
+
+	{
+		sections.map((section) => (
+			<section class="section-block">
+				<div class="section-head">
+					<h2>{section.label}</h2>
+				</div>
+
+				<div class="row-list">
+					{
+						section.items.map((entry) => (
+							<EntryRow
+								href={entry.href}
+								title={entry.title}
+								summary={entry.summary}
+								date={entry.created}
+								bucket={entry.bucket}
+								kind={entry.kind}
+							/>
+						))
+					}
+				</div>
+			</section>
+		))
+	}
+</Layout>

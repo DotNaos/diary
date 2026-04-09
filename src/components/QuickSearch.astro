@@ -1,0 +1,133 @@
+---
+import { formatCompactDate } from '../lib/date';
+import { bucketLabels, getKindLabel } from '../lib/taxonomy';
+import type { EntryPreview } from '../lib/content';
+
+interface Props {
+	entries: EntryPreview[];
+}
+
+const { entries } = Astro.props;
+const searchId = `search-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<section class="search-panel" id={searchId} data-search-root>
+	<div class="search-toolbar">
+		<div>
+			<p class="eyebrow">Schnellsuche</p>
+			<h2>Alles durchsuchen</h2>
+		</div>
+
+		<label class="search-field">
+			<span class="sr-only">Einträge durchsuchen</span>
+			<input
+				type="search"
+				placeholder="Suche nach Begriff, Tag oder Stimmung"
+				data-search-input
+			/>
+		</label>
+	</div>
+
+	<div class="search-filters" role="tablist" aria-label="Filter für Einträge">
+		<button class="filter-pill is-active" type="button" data-filter="all">Alles</button>
+		<button class="filter-pill" type="button" data-filter="library">Bibliothek</button>
+		<button class="filter-pill" type="button" data-filter="inbox">Inbox</button>
+	</div>
+
+	<div class="search-meta">
+		<span><strong data-search-count>{entries.length}</strong> Einträge sichtbar</span>
+	</div>
+
+	<div class="search-results" data-results>
+		{
+			entries.map((entry) => {
+				const haystack = [entry.title, entry.summary, ...entry.tags, entry.kind, bucketLabels[entry.bucket]]
+					.join(' ')
+					.toLowerCase();
+
+				return (
+					<a
+						href={entry.href}
+						class="search-card"
+						data-entry
+						data-bucket={entry.bucket}
+						data-haystack={haystack}
+					>
+						<div class="entry-card-head">
+							<span class="mini-label">{bucketLabels[entry.bucket]}</span>
+							<span class="status-pill">{getKindLabel(entry.bucket, entry.kind)}</span>
+						</div>
+
+						<div class="entry-row-copy">
+							<h3>{entry.title}</h3>
+							<p>{entry.summary}</p>
+						</div>
+
+						<time datetime={entry.created.toISOString()}>{formatCompactDate(entry.created)}</time>
+					</a>
+				);
+			})
+		}
+	</div>
+
+	<p class="empty-state" hidden data-empty-state>
+		Kein Eintrag passt gerade auf diese Spur. Andere Begriffe oder den Filter wechseln hilft meist.
+	</p>
+</section>
+
+<script define:vars={{ searchId }}>
+	const root = document.getElementById(searchId);
+
+	if (root) {
+		const input = root.querySelector('[data-search-input]');
+		const count = root.querySelector('[data-search-count]');
+		const emptyState = root.querySelector('[data-empty-state]');
+		const cards = [...root.querySelectorAll('[data-entry]')];
+		const buttons = [...root.querySelectorAll('[data-filter]')];
+
+		let activeFilter = 'all';
+
+		const refresh = () => {
+			const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+			let visible = 0;
+
+			for (const card of cards) {
+				const bucket = card.getAttribute('data-bucket') ?? 'all';
+				const haystack = card.getAttribute('data-haystack') ?? '';
+				const filterMatch = activeFilter === 'all' || bucket === activeFilter;
+				const queryMatch = query.length === 0 || haystack.includes(query);
+				const matches = filterMatch && queryMatch;
+
+				card.toggleAttribute('hidden', !matches);
+
+				if (matches) {
+					visible += 1;
+				}
+			}
+
+			if (count) {
+				count.textContent = String(visible);
+			}
+
+			if (emptyState instanceof HTMLElement) {
+				emptyState.hidden = visible > 0;
+			}
+		};
+
+		input?.addEventListener('input', refresh);
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				activeFilter = button.getAttribute('data-filter') ?? 'all';
+
+				for (const candidate of buttons) {
+					candidate.classList.toggle('is-active', candidate === button);
+				}
+
+				refresh();
+			});
+		}
+
+		refresh();
+	}
+</script>

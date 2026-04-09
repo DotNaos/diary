@@ -1,11 +1,53 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import EntryRow from '../components/EntryRow.astro';
+import QuickSearch from '../components/QuickSearch.astro';
 import Layout from '../layouts/Layout.astro';
+import { getAllPreviews } from '../lib/content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const allEntries = await getAllPreviews();
+const latestEntries = allEntries.slice(0, 4);
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+	title="Diary"
+	description="Persönliche Wissensbibliothek mit Inbox, Bibliothek und einem ruhigen Lesefrontend."
+	active="home"
+>
+	<section class="utility-bar">
+		<div>
+			<p class="eyebrow">Start</p>
+			<p class="utility-copy">Inbox sammelt Rohmaterial. Bibliothek hält die lesbaren Stücke.</p>
+		</div>
+		<div class="utility-links">
+			<a class="quiet-link" href="/inbox/">Inbox</a>
+			<a class="quiet-link" href="/library/">Bibliothek</a>
+		</div>
+	</section>
+
+	<QuickSearch entries={allEntries} />
+
+	<section class="section-block">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Zuletzt bewegt</p>
+				<h2>Neueste Einträge</h2>
+			</div>
+			<a class="section-link" href="/library/">Alle lesen</a>
+		</div>
+
+		<div class="row-list">
+			{
+				latestEntries.map((entry) => (
+					<EntryRow
+						href={entry.href}
+						title={entry.title}
+						summary={entry.summary}
+						date={entry.created}
+						bucket={entry.bucket}
+						kind={entry.kind}
+					/>
+				))
+			}
+		</div>
+	</section>
 </Layout>
