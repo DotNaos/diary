@@ -15,6 +15,10 @@ export interface EntryPreview {
 	href: string;
 }
 
+export type EntryRecord =
+	| { bucket: 'library'; entry: CollectionEntry<'library'> }
+	| { bucket: 'inbox'; entry: CollectionEntry<'inbox'> };
+
 export async function getLibraryEntries() {
 	const entries = await getCollection('library');
 	return sortByNewest(entries);
@@ -38,6 +42,27 @@ export async function getInboxPreviews() {
 export async function getAllPreviews() {
 	const [library, inbox] = await Promise.all([getLibraryPreviews(), getInboxPreviews()]);
 	return sortByNewest([...library, ...inbox]);
+}
+
+export async function getLatestEntryRecord(bucket?: Bucket): Promise<EntryRecord | null> {
+	if (bucket === 'library') {
+		const [entry] = await getLibraryEntries();
+		return entry ? { bucket: 'library', entry } : null;
+	}
+
+	if (bucket === 'inbox') {
+		const [entry] = await getInboxEntries();
+		return entry ? { bucket: 'inbox', entry } : null;
+	}
+
+	const [library, inbox] = await Promise.all([getLibraryEntries(), getInboxEntries()]);
+	const combined: EntryRecord[] = [
+		...library.map((entry) => ({ bucket: 'library' as const, entry })),
+		...inbox.map((entry) => ({ bucket: 'inbox' as const, entry })),
+	];
+
+	const [latest] = sortByNewest(combined);
+	return latest ?? null;
 }
 
 export function collectTagCounts(entries: EntryPreview[]) {
@@ -71,10 +96,25 @@ function toPreview(
 	};
 }
 
-function sortByNewest<T extends { created: Date } | { data: { created: Date } }>(entries: T[]) {
+function sortByNewest<
+	T extends
+		| { created: Date }
+		| { data: { created: Date } }
+		| { entry: { data: { created: Date } } },
+>(entries: T[]) {
 	return [...entries].sort((left, right) => {
-		const leftDate = 'data' in left ? left.data.created : left.created;
-		const rightDate = 'data' in right ? right.data.created : right.created;
+		const leftDate =
+			'created' in left
+				? left.created
+				: 'data' in left
+					? left.data.created
+					: left.entry.data.created;
+		const rightDate =
+			'created' in right
+				? right.created
+				: 'data' in right
+					? right.data.created
+					: right.entry.data.created;
 		return rightDate.getTime() - leftDate.getTime();
 	});
 }

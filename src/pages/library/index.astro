@@ -1,62 +1,27 @@
 ---
-import { Separator } from '@/components/ui/separator';
-import EntryRow from '../../components/EntryRow.astro';
+import { render } from 'astro:content';
+import EntryReader from '@/components/EntryReader.astro';
 import Layout from '../../layouts/Layout.astro';
-import { getLibraryPreviews } from '../../lib/content';
-import { libraryKindLabels } from '../../lib/taxonomy';
+import { getLatestEntryRecord } from '@/lib/content';
+import { withBase } from '@/lib/paths';
 
-const entries = await getLibraryPreviews();
+const latest = await getLatestEntryRecord('library');
 
-const sections = (['insight', 'idea', 'life', 'journal'] as const)
-	.map((kind) => ({
-		kind,
-		label: libraryKindLabels[kind],
-		items: entries.filter((entry) => entry.kind === kind),
-	}))
-	.filter((section) => section.items.length > 0);
+if (!latest) {
+	throw new Error('Bibliothek benötigt mindestens einen Eintrag.');
+}
+
+const { Content } = await render(latest.entry);
+const selectedHref = withBase(`/library/${latest.entry.id}/`);
 ---
 
 <Layout
-	title="Bibliothek"
-	description="Sortierte Einträge, Erkenntnisse, Projektgedanken und längere Notizen."
+	title={latest.entry.data.title}
+	description={latest.entry.data.summary}
 	active="library"
+	selectedHref={selectedHref}
 >
-	<header class="space-y-1">
-		<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Bibliothek</p>
-		<h1 class="text-lg font-medium tracking-tight text-foreground">Lesbare Stücke</h1>
-		<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
-			Einträge, die schon genug Form haben, um wiedergefunden zu werden.
-		</p>
-	</header>
-
-	<Separator />
-
-	<div class="space-y-8">
-		{
-			sections.map((section) => (
-				<section class="space-y-3">
-					<div class="space-y-1">
-						<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-							{section.label}
-						</p>
-					</div>
-
-					<div class="divide-y">
-						{
-							section.items.map((entry) => (
-								<EntryRow
-									href={entry.href}
-									title={entry.title}
-									summary={entry.summary}
-									date={entry.created}
-									bucket={entry.bucket}
-									kind={entry.kind}
-								/>
-							))
-						}
-					</div>
-				</section>
-			))
-		}
-	</div>
+	<EntryReader title={latest.entry.data.title} summary={latest.entry.data.summary}>
+		<Content />
+	</EntryReader>
 </Layout>

@@ -1,5 +1,4 @@
 ---
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Layout from '../layouts/Layout.astro';
 ---
@@ -9,69 +8,52 @@ import Layout from '../layouts/Layout.astro';
 	description="Wie Inbox, Bibliothek, GitHub und ein späterer Agent zusammenarbeiten sollen."
 	active="system"
 >
-	<header class="space-y-1">
-		<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">System</p>
-		<h1 class="text-lg font-medium tracking-tight text-foreground">Schlicht aufgebaut</h1>
-		<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
-			Der dauerhafte Speicher bleibt im Repository. Alles andere darf flüchtig bleiben.
-		</p>
-	</header>
+	<article class="mx-auto flex max-w-[44rem] flex-col gap-8">
+		<header class="flex flex-col gap-3">
+			<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">System</p>
+			<h1 class="text-[1.9rem] leading-tight font-medium tracking-[-0.035em] text-foreground sm:text-[2.35rem]">
+				Schlicht aufgebaut
+			</h1>
+			<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
+				Der dauerhafte Speicher bleibt im Repository. Alles andere darf flüchtig bleiben.
+			</p>
+		</header>
 
-	<Separator />
+		<Separator />
 
-	<section class="space-y-4">
-		<div class="space-y-3">
-			<div class="flex items-start gap-3">
-				<Badge variant="outline" className="mt-0.5 rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
-					1
-				</Badge>
-				<div class="space-y-1">
-					<h2 class="text-sm font-medium tracking-tight text-foreground">GitHub hält die Dateien</h2>
-					<p class="text-sm leading-6 text-muted-foreground">
-						Inbox und Bibliothek liegen als Markdown direkt im Repo.
-					</p>
-				</div>
-			</div>
+		<section class="flex flex-col gap-3">
+			<h2 class="text-sm font-medium tracking-tight text-foreground">Aufbau</h2>
 
-			<div class="flex items-start gap-3">
-				<Badge variant="outline" className="mt-0.5 rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
-					2
-				</Badge>
-				<div class="space-y-1">
-					<h2 class="text-sm font-medium tracking-tight text-foreground">Astro liest nur</h2>
-					<p class="text-sm leading-6 text-muted-foreground">
-						Das Frontend ist vor allem eine ruhige Lesefläche und Navigation.
-					</p>
-				</div>
-			</div>
+			<ol class="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
+				<li>
+					<span class="font-medium text-foreground">GitHub hält die Dateien.</span>
+					{' '}
+					Inbox und Bibliothek liegen als Markdown direkt im Repo.
+				</li>
+				<li>
+					<span class="font-medium text-foreground">Astro liest nur.</span>
+					{' '}
+					Das Frontend ist vor allem eine ruhige Lesefläche und Navigation.
+				</li>
+				<li>
+					<span class="font-medium text-foreground">Vercel bleibt flüchtig.</span>
+					{' '}
+					Später kann dort ein Inbox-Eingang oder ein kleiner Kurationslauf laufen, ohne selbst das Archiv zu sein.
+				</li>
+			</ol>
+		</section>
 
-			<div class="flex items-start gap-3">
-				<Badge variant="outline" className="mt-0.5 rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
-					3
-				</Badge>
-				<div class="space-y-1">
-					<h2 class="text-sm font-medium tracking-tight text-foreground">Vercel bleibt flüchtig</h2>
-					<p class="text-sm leading-6 text-muted-foreground">
-						Später kann dort ein Inbox-Eingang oder ein kleiner Kurationslauf laufen, ohne selbst das Archiv zu sein.
-					</p>
-				</div>
-			</div>
-		</div>
-	</section>
+		<Separator />
 
-	<Separator />
+		<section class="flex flex-col gap-3">
+			<h2 class="text-sm font-medium tracking-tight text-foreground">Geplanter Lauf</h2>
 
-	<section class="space-y-3">
-		<div class="space-y-1">
-			<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Agent</p>
-			<h2 class="text-base font-medium tracking-tight text-foreground">Geplanter Lauf</h2>
-		</div>
-
-		<ol class="space-y-3 pl-5 text-sm leading-6 text-muted-foreground">
-			<li>einen rohen Inbox-Eintrag lesen</li>
-			<li>ihn sprachlich klären und einordnen</li>
-			<li>als Bibliothekseintrag zurück ins Repo schreiben</li>
-			<li>den ursprünglichen Zettel als verarbeitet markieren</li>
-		</ol>
-	</section>
+			<ol class="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
+				<li>einen rohen Inbox-Eintrag lesen</li>
+				<li>ihn sprachlich klären und einordnen</li>
+				<li>als Bibliothekseintrag zurück ins Repo schreiben</li>
+				<li>den ursprünglichen Zettel als verarbeitet markieren</li>
+			</ol>
+		</section>
+	</article>
 </Layout>

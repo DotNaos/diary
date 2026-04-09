@@ -1,64 +1,27 @@
 ---
-import { buttonVariants } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { withBase } from '@/lib/paths';
-import EntryRow from '../components/EntryRow.astro';
-import QuickSearch from '../components/QuickSearch.astro';
+import { render } from 'astro:content';
+import EntryReader from '@/components/EntryReader.astro';
 import Layout from '../layouts/Layout.astro';
-import { cn } from '@/lib/utils';
-import { getAllPreviews } from '../lib/content';
+import { getLatestEntryRecord } from '@/lib/content';
+import { withBase } from '@/lib/paths';
 
-const allEntries = await getAllPreviews();
-const latestEntries = allEntries.slice(0, 4);
+const latest = await getLatestEntryRecord();
+
+if (!latest) {
+	throw new Error('Diary benötigt mindestens einen Eintrag.');
+}
+
+const { Content } = await render(latest.entry);
+const selectedHref = withBase(`/${latest.bucket}/${latest.entry.id}/`);
 ---
 
 <Layout
-	title="Diary"
-	description="Persönliche Wissensbibliothek mit Inbox, Bibliothek und einem ruhigen Lesefrontend."
+	title={latest.entry.data.title}
+	description={latest.entry.data.summary}
 	active="home"
+	selectedHref={selectedHref}
 >
-	<section class="space-y-4">
-		<div class="space-y-1">
-			<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Diary</p>
-			<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
-				Inbox sammelt Rohmaterial. Bibliothek hält die lesbaren Stücke.
-			</p>
-		</div>
-
-		<Separator />
-
-		<QuickSearch entries={allEntries} />
-	</section>
-
-	<section class="space-y-4">
-		<div class="flex items-center justify-between gap-4">
-			<div class="space-y-1">
-				<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Neueste</p>
-				<h2 class="text-base font-medium tracking-tight text-foreground">Zuletzt bewegt</h2>
-			</div>
-			<a
-				href={withBase('/library/')}
-				class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'rounded-md text-muted-foreground')}
-			>
-				Alle lesen
-			</a>
-		</div>
-
-		<Separator />
-
-		<div class="divide-y">
-			{
-				latestEntries.map((entry) => (
-					<EntryRow
-						href={entry.href}
-						title={entry.title}
-						summary={entry.summary}
-						date={entry.created}
-						bucket={entry.bucket}
-						kind={entry.kind}
-					/>
-				))
-			}
-		</div>
-	</section>
+	<EntryReader title={latest.entry.data.title} summary={latest.entry.data.summary}>
+		<Content />
+	</EntryReader>
 </Layout>

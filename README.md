@@ -16,7 +16,19 @@ pnpm install
 pnpm dev
 ```
 
-Die lokale Seite läuft danach unter `http://localhost:4321`.
+Die lokale Seite läuft danach unter einer festen Portless-URL:
+
+- `http://diary.localhost:1355`
+
+Wenn der Portless-Proxy auf deinem Rechner mit TLS und Port `443` läuft, ist es stattdessen:
+
+- `https://diary.localhost`
+
+Falls du den Proxy einmal bewusst umgehen willst:
+
+```sh
+pnpm dev:raw
+```
 
 ## Deployment
 

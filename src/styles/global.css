@@ -69,6 +69,80 @@
 }
 
 @layer components {
+	.reader-frame {
+		isolation: isolate;
+	}
+
+	.reader-stage {
+		transition:
+			opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+			transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1);
+		will-change: opacity, transform;
+	}
+
+	.reader-loading {
+		position: absolute;
+		inset: 0;
+		z-index: 10;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		padding: 1rem 0 0;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.reader-loading-lines {
+		display: flex;
+		width: min(44rem, 100%);
+		flex-direction: column;
+		gap: 0.85rem;
+		border-radius: calc(var(--radius) + 0.25rem);
+		background:
+			linear-gradient(
+				90deg,
+				color-mix(in oklab, var(--background) 92%, transparent) 0%,
+				color-mix(in oklab, var(--muted) 88%, transparent) 50%,
+				color-mix(in oklab, var(--background) 92%, transparent) 100%
+			);
+		padding: 1rem 0;
+	}
+
+	.reader-loading-line {
+		display: block;
+		height: 0.8rem;
+		border-radius: 999px;
+		background: color-mix(in oklab, var(--muted) 84%, white 16%);
+		animation: reader-loading-pulse 1.25s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+	}
+
+	.reader-loading-line-sm {
+		width: 7rem;
+	}
+
+	.reader-loading-line-lg {
+		width: min(28rem, 92%);
+		height: 1.1rem;
+	}
+
+	.reader-loading-line-md {
+		width: min(21rem, 78%);
+	}
+
+	.reader-loading-line-xs {
+		width: 11rem;
+	}
+
+	html[data-reader-loading='true'] .reader-stage {
+		transform: translateY(6px);
+		opacity: 0.22;
+	}
+
+	html[data-reader-loading='true'] .reader-loading {
+		opacity: 1;
+	}
+
 	.prose-copy {
 		max-width: none;
 		font-size: 15px;
@@ -130,6 +204,18 @@
 	.prose-copy hr {
 		margin: 2rem 0;
 		border-color: var(--border);
+	}
+}
+
+@keyframes reader-loading-pulse {
+	0% {
+		opacity: 0.45;
+		transform: scaleX(0.985);
+	}
+
+	100% {
+		opacity: 0.9;
+		transform: scaleX(1);
 	}
 }
 

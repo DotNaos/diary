@@ -1,8 +1,8 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import AgentationToolbar from '../components/AgentationToolbar';
-import { buttonVariants } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
+import EntryExplorer from '@/components/EntryExplorer';
+import { getAllPreviews } from '@/lib/content';
 import { withBase } from '@/lib/paths';
 import '../styles/global.css';
 
@@ -10,22 +10,18 @@ interface Props {
 	title?: string;
 	description?: string;
 	active?: 'home' | 'library' | 'inbox' | 'system';
+	selectedHref?: string;
 }
 
 const {
 	title = 'Diary',
 	description = 'Eine ruhige Bibliothek aus Notizen, Erkenntnissen, Projektideen und rohen Gedanken.',
 	active = 'home',
+	selectedHref,
 } = Astro.props;
 
 const pageTitle = title === 'Diary' ? title : `${title} · Diary`;
-
-const navigation = [
-	{ href: '/', label: 'Start', key: 'home' },
-	{ href: '/library/', label: 'Bibliothek', key: 'library' },
-	{ href: '/inbox/', label: 'Inbox', key: 'inbox' },
-	{ href: '/system/', label: 'System', key: 'system' },
-] as const;
+const entries = await getAllPreviews();
 ---
 
 <!doctype html>
@@ -33,6 +29,7 @@ const navigation = [
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<ClientRouter />
 		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
 		<link rel="icon" href={withBase('/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
@@ -40,56 +37,59 @@ const navigation = [
 		<title>{pageTitle}</title>
 	</head>
 	<body>
-		<div class="mx-auto grid min-h-screen w-full max-w-6xl gap-8 px-4 py-5 sm:px-6 lg:grid-cols-[10.5rem_minmax(0,1fr)] lg:px-8">
-			<aside class="flex flex-col gap-5 lg:sticky lg:top-6 lg:h-fit">
-				<div class="space-y-1">
-					<a href={withBase('/')} class="text-sm font-medium tracking-tight text-foreground">Diary</a>
-					<p class="text-xs leading-5 text-muted-foreground">
-						Markdown, leise lesbar gemacht.
-					</p>
-				</div>
+		<div class="mx-auto grid min-h-screen w-full max-w-[112rem] gap-8 px-4 pt-7 pb-5 sm:px-6 sm:pt-8 sm:pb-6 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12 lg:px-8 lg:pt-10">
+			<EntryExplorer
+				client:load
+				transition:persist="diary-explorer"
+				entries={entries}
+				selectedHref={selectedHref}
+				active={active}
+			/>
 
-				<nav class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-1" aria-label="Hauptnavigation">
-					{
-						navigation.map((item) => (
-							<a
-								href={withBase(item.href)}
-								class={cn(
-									buttonVariants({
-										variant: active === item.key ? 'secondary' : 'ghost',
-										size: 'sm',
-									}),
-									'justify-start rounded-md px-3 text-muted-foreground',
-									active === item.key && 'text-foreground',
-								)}
-							>
-								{item.label}
-							</a>
-						))
-					}
-				</nav>
-
-				<div class="hidden lg:block">
-					<Separator className="mb-4" />
-					<div class="space-y-2">
-						<p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Markdown</p>
-						<p class="text-xs text-muted-foreground">src/content/inbox</p>
-						<p class="text-xs text-muted-foreground">src/content/library</p>
+			<div class="reader-shell min-w-0 lg:border-l lg:pl-12">
+				<div class="reader-frame relative min-h-[60svh] w-full">
+					<div aria-hidden="true" class="reader-loading">
+						<div class="reader-loading-lines">
+							<span class="reader-loading-line reader-loading-line-sm"></span>
+							<span class="reader-loading-line reader-loading-line-lg"></span>
+							<span class="reader-loading-line reader-loading-line-md"></span>
+							<span class="reader-loading-line reader-loading-line-xs"></span>
+						</div>
 					</div>
+
+					<main id="reader-root" class="reader-stage w-full py-4 lg:pt-8 lg:pb-5">
+						<slot />
+					</main>
 				</div>
-			</aside>
-
-			<div class="min-w-0">
-				<main class="space-y-10">
-					<slot />
-				</main>
-
-				<footer class="mt-10 border-t pt-4 text-xs text-muted-foreground">
-					GitHub ist das Regal. Astro ist nur die Leseschicht.
-				</footer>
 			</div>
 		</div>
 
 		<AgentationToolbar client:only="react" />
+
+		<script is:inline>
+			if (!window.__diaryReaderLoadingBound) {
+				window.__diaryReaderLoadingBound = true;
+
+				const showLoading = (target = document) => {
+					target.documentElement.setAttribute('data-reader-loading', 'true');
+				};
+
+				const hideLoading = (target = document) => {
+					target.documentElement.removeAttribute('data-reader-loading');
+				};
+
+				document.addEventListener('astro:before-preparation', () => {
+					showLoading(document);
+				});
+
+				document.addEventListener('astro:before-swap', (event) => {
+					showLoading(event.newDocument);
+				});
+
+				document.addEventListener('astro:page-load', () => {
+					hideLoading(document);
+				});
+			}
+		</script>
 	</body>
 </html>

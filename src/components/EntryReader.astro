@@ -1,0 +1,27 @@
+---
+import { Separator } from '@/components/ui/separator';
+
+interface Props {
+	title: string;
+	summary: string;
+}
+
+const { title, summary } = Astro.props;
+---
+
+<article class="mx-auto flex max-w-[44rem] flex-col gap-8">
+	<header class="flex flex-col gap-3">
+		<div class="flex flex-col gap-3">
+			<h1 class="max-w-3xl text-[1.9rem] leading-tight font-medium tracking-[-0.035em] text-foreground sm:text-[2.35rem]">
+				{title}
+			</h1>
+			<p class="max-w-2xl text-sm leading-6 text-muted-foreground">{summary}</p>
+		</div>
+	</header>
+
+	<Separator />
+
+	<div class="prose-copy">
+		<slot />
+	</div>
+</article>
