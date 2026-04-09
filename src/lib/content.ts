@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 import type { Bucket } from './taxonomy';
+import { withBase } from './paths';
 
 export interface EntryPreview {
 	bucket: Bucket;
@@ -66,7 +67,7 @@ function toPreview(
 		tags: entry.data.tags,
 		kind: entry.data.kind,
 		featured: entry.data.featured,
-		href: `/${bucket}/${entry.id}/`,
+		href: withBase(`/${bucket}/${entry.id}/`),
 	};
 }
 

@@ -7,7 +7,7 @@ Diary ist eine persönliche Wissensbibliothek auf Markdown-Basis.
 - `src/content/inbox`: rohe Gedanken, Fragmente und unfertige Einfälle
 - `src/content/library`: sortierte Einträge, Erkenntnisse und längere Notizen
 - Astro-Frontend zum schnellen Lesen, Stöbern und Suchen
-- Vercel-Adapter, damit serverlose Erweiterungen später ohne Neustart der Architektur dazukommen
+- GitHub-Pages-Deploy per GitHub Actions
 
 ## Entwicklung
 
@@ -17,6 +17,14 @@ pnpm dev
 ```
 
 Die lokale Seite läuft danach unter `http://localhost:4321`.
+
+## Deployment
+
+Das Repository ist für GitHub Pages vorbereitet.
+
+- Push auf `main` startet automatisch den Deploy-Workflow.
+- Die Seite wird dann unter `https://dotnaos.github.io/diary/` veröffentlicht.
+- Neue Markdown-Dateien unter `src/content/inbox` oder `src/content/library` erscheinen nach dem nächsten Push automatisch auf der Seite.
 
 ## Agentation Feedback
 

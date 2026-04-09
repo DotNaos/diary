@@ -1,7 +1,11 @@
 ---
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { withBase } from '@/lib/paths';
+import { cn } from '@/lib/utils';
 import { getCollection, render } from 'astro:content';
-
-import EntryCard from '../../components/EntryCard.astro';
+import EntryRow from '../../components/EntryRow.astro';
 import Layout from '../../layouts/Layout.astro';
 import { formatLongDate } from '../../lib/date';
 import { getInboxPreviews } from '../../lib/content';
@@ -20,50 +24,62 @@ const neighbors = allEntries.filter((candidate) => candidate.slug !== entry.id).
 ---
 
 <Layout title={entry.data.title} description={entry.data.summary} active="inbox">
-	<article class="post-shell">
-		<a class="back-link" href="/inbox/">Zurück zur Inbox</a>
+	<article class="space-y-6">
+		<a
+			href={withBase('/inbox/')}
+			class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'w-fit rounded-md px-0 text-muted-foreground')}
+		>
+			Zurück zur Inbox
+		</a>
 
-		<header class="post-header">
-			<div class="entry-card-head">
-				<span class="mini-label">{bucketLabels.inbox}</span>
-				<span class="status-pill">{getKindLabel('inbox', entry.data.kind)}</span>
+		<header class="space-y-4">
+			<div class="flex flex-wrap items-center gap-2">
+				<Badge variant="outline" className="rounded-md px-1.5 py-0 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+					{bucketLabels.inbox}
+				</Badge>
+				<Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
+					{getKindLabel('inbox', entry.data.kind)}
+				</Badge>
+				<span class="text-xs text-muted-foreground">{formatLongDate(entry.data.created)}</span>
 			</div>
 
-			<h1>{entry.data.title}</h1>
-			<p class="post-summary">{entry.data.summary}</p>
+			<div class="space-y-2">
+				<h1 class="max-w-3xl text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+					{entry.data.title}
+				</h1>
+				<p class="max-w-2xl text-sm leading-6 text-muted-foreground">{entry.data.summary}</p>
+			</div>
 
-			<div class="post-meta">
-				<time datetime={entry.data.created.toISOString()}>{formatLongDate(entry.data.created)}</time>
-				<div class="tag-row">
-					{entry.data.tags.map((tag) => <span class="tag-chip">#{tag}</span>)}
-				</div>
+			<div class="flex flex-wrap gap-2">
+				{entry.data.tags.map((tag) => <Badge variant="outline" className="rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">#{tag}</Badge>)}
 			</div>
 		</header>
 
-		<div class="rich-copy">
+		<Separator />
+
+		<div class="prose-copy">
 			<Content />
 		</div>
 	</article>
 
 	{
 		neighbors.length > 0 && (
-			<section class="section-block">
-				<div class="section-head">
-					<div>
-						<p class="eyebrow">Andere offene Notizen</p>
-						<h2>Mehr Rohmaterial</h2>
-					</div>
+			<section class="space-y-4">
+				<div class="space-y-1">
+					<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Weiter offen</p>
+					<h2 class="text-base font-medium tracking-tight text-foreground">Andere Notizen</h2>
 				</div>
 
-				<div class="card-grid">
+				<Separator />
+
+				<div class="divide-y">
 					{
 						neighbors.map((item) => (
-							<EntryCard
+							<EntryRow
 								href={item.href}
 								title={item.title}
 								summary={item.summary}
 								date={item.created}
-								tags={item.tags}
 								bucket={item.bucket}
 								kind={item.kind}
 							/>

@@ -1,7 +1,11 @@
 ---
+import { buttonVariants } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { withBase } from '@/lib/paths';
 import EntryRow from '../components/EntryRow.astro';
 import QuickSearch from '../components/QuickSearch.astro';
 import Layout from '../layouts/Layout.astro';
+import { cn } from '@/lib/utils';
 import { getAllPreviews } from '../lib/content';
 
 const allEntries = await getAllPreviews();
@@ -13,29 +17,36 @@ const latestEntries = allEntries.slice(0, 4);
 	description="Persönliche Wissensbibliothek mit Inbox, Bibliothek und einem ruhigen Lesefrontend."
 	active="home"
 >
-	<section class="utility-bar">
-		<div>
-			<p class="eyebrow">Start</p>
-			<p class="utility-copy">Inbox sammelt Rohmaterial. Bibliothek hält die lesbaren Stücke.</p>
+	<section class="space-y-4">
+		<div class="space-y-1">
+			<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Diary</p>
+			<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
+				Inbox sammelt Rohmaterial. Bibliothek hält die lesbaren Stücke.
+			</p>
 		</div>
-		<div class="utility-links">
-			<a class="quiet-link" href="/inbox/">Inbox</a>
-			<a class="quiet-link" href="/library/">Bibliothek</a>
-		</div>
+
+		<Separator />
+
+		<QuickSearch entries={allEntries} />
 	</section>
 
-	<QuickSearch entries={allEntries} />
-
-	<section class="section-block">
-		<div class="section-head">
-			<div>
-				<p class="eyebrow">Zuletzt bewegt</p>
-				<h2>Neueste Einträge</h2>
+	<section class="space-y-4">
+		<div class="flex items-center justify-between gap-4">
+			<div class="space-y-1">
+				<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Neueste</p>
+				<h2 class="text-base font-medium tracking-tight text-foreground">Zuletzt bewegt</h2>
 			</div>
-			<a class="section-link" href="/library/">Alle lesen</a>
+			<a
+				href={withBase('/library/')}
+				class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'rounded-md text-muted-foreground')}
+			>
+				Alle lesen
+			</a>
 		</div>
 
-		<div class="row-list">
+		<Separator />
+
+		<div class="divide-y">
 			{
 				latestEntries.map((entry) => (
 					<EntryRow

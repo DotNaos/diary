@@ -1,4 +1,8 @@
 ---
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { formatCompactDate } from '../lib/date';
 import { bucketLabels, getKindLabel } from '../lib/taxonomy';
 import type { EntryPreview } from '../lib/content';
@@ -11,69 +15,101 @@ const { entries } = Astro.props;
 const searchId = `search-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
-<section class="search-panel" id={searchId} data-search-root>
-	<div class="search-toolbar">
-		<div>
-			<p class="eyebrow">Schnellsuche</p>
-			<h2>Alles durchsuchen</h2>
+<section class="space-y-4" id={searchId} data-search-root>
+	<div class="space-y-3">
+		<div class="flex items-center justify-between gap-4">
+			<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Suche</p>
+			<p class="text-xs text-muted-foreground">
+				<strong class="font-medium text-foreground" data-search-count>{entries.length}</strong>
+				{' '}
+				sichtbar
+			</p>
 		</div>
 
-		<label class="search-field">
-			<span class="sr-only">Einträge durchsuchen</span>
-			<input
-				type="search"
-				placeholder="Suche nach Begriff, Tag oder Stimmung"
-				data-search-input
-			/>
-		</label>
+		<Input
+			type="search"
+			placeholder="Suche nach Begriff, Tag oder Stimmung"
+			data-search-input
+			className="h-10 rounded-md border-0 border-b bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
+		/>
+
+		<div class="flex flex-wrap gap-1.5" role="tablist" aria-label="Filter für Einträge">
+			<Button className="search-filter rounded-md" size="sm" variant="ghost" type="button" data-filter="all" data-active="true">
+				Alles
+			</Button>
+			<Button className="search-filter rounded-md" size="sm" variant="ghost" type="button" data-filter="library" data-active="false">
+				Bibliothek
+			</Button>
+			<Button className="search-filter rounded-md" size="sm" variant="ghost" type="button" data-filter="inbox" data-active="false">
+				Inbox
+			</Button>
+		</div>
 	</div>
 
-	<div class="search-filters" role="tablist" aria-label="Filter für Einträge">
-		<button class="filter-pill is-active" type="button" data-filter="all">Alles</button>
-		<button class="filter-pill" type="button" data-filter="library">Bibliothek</button>
-		<button class="filter-pill" type="button" data-filter="inbox">Inbox</button>
-	</div>
+	<Separator />
 
-	<div class="search-meta">
-		<span><strong data-search-count>{entries.length}</strong> Einträge sichtbar</span>
-	</div>
-
-	<div class="search-results" data-results>
+	<div class="divide-y" data-results>
 		{
 			entries.map((entry) => {
-				const haystack = [entry.title, entry.summary, ...entry.tags, entry.kind, bucketLabels[entry.bucket]]
+				const haystack = [
+					entry.title,
+					entry.summary,
+					...entry.tags,
+					entry.kind,
+					bucketLabels[entry.bucket],
+				]
 					.join(' ')
 					.toLowerCase();
 
 				return (
 					<a
 						href={entry.href}
-						class="search-card"
+						class="group flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
 						data-entry
 						data-bucket={entry.bucket}
 						data-haystack={haystack}
 					>
-						<div class="entry-card-head">
-							<span class="mini-label">{bucketLabels[entry.bucket]}</span>
-							<span class="status-pill">{getKindLabel(entry.bucket, entry.kind)}</span>
+						<div class="min-w-0 space-y-2">
+							<div class="flex flex-wrap items-center gap-2">
+								<Badge variant="outline" className="rounded-md px-1.5 py-0 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+									{bucketLabels[entry.bucket]}
+								</Badge>
+								<Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
+									{getKindLabel(entry.bucket, entry.kind)}
+								</Badge>
+							</div>
+
+							<div class="space-y-1">
+								<h3 class="text-[15px] font-medium tracking-[-0.01em] text-foreground transition-colors group-hover:text-foreground/70">
+									{entry.title}
+								</h3>
+								<p class="max-w-2xl text-sm leading-6 text-muted-foreground">{entry.summary}</p>
+							</div>
 						</div>
 
-						<div class="entry-row-copy">
-							<h3>{entry.title}</h3>
-							<p>{entry.summary}</p>
-						</div>
-
-						<time datetime={entry.created.toISOString()}>{formatCompactDate(entry.created)}</time>
+						<time
+							class="shrink-0 pt-0.5 text-xs text-muted-foreground"
+							datetime={entry.created.toISOString()}
+						>
+							{formatCompactDate(entry.created)}
+						</time>
 					</a>
 				);
 			})
 		}
 	</div>
 
-	<p class="empty-state" hidden data-empty-state>
-		Kein Eintrag passt gerade auf diese Spur. Andere Begriffe oder den Filter wechseln hilft meist.
+	<p class="text-sm leading-6 text-muted-foreground" hidden data-empty-state>
+		Kein Eintrag passt dazu.
 	</p>
 </section>
+
+<style>
+	.search-filter[data-active='true'] {
+		background: color-mix(in oklab, var(--secondary) 100%, transparent);
+		color: var(--foreground);
+	}
+</style>
 
 <script define:vars={{ searchId }}>
 	const root = document.getElementById(searchId);
@@ -121,7 +157,7 @@ const searchId = `search-${Math.random().toString(36).slice(2, 8)}`;
 				activeFilter = button.getAttribute('data-filter') ?? 'all';
 
 				for (const candidate of buttons) {
-					candidate.classList.toggle('is-active', candidate === button);
+					candidate.setAttribute('data-active', String(candidate === button));
 				}
 
 				refresh();

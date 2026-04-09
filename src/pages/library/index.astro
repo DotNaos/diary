@@ -1,4 +1,5 @@
 ---
+import { Separator } from '@/components/ui/separator';
 import EntryRow from '../../components/EntryRow.astro';
 import Layout from '../../layouts/Layout.astro';
 import { getLibraryPreviews } from '../../lib/content';
@@ -20,37 +21,42 @@ const sections = (['insight', 'idea', 'life', 'journal'] as const)
 	description="Sortierte Einträge, Erkenntnisse, Projektgedanken und längere Notizen."
 	active="library"
 >
-	<section class="page-hero">
-		<p class="eyebrow">Bibliothek</p>
-		<h1>Alles, was schon eine Form gefunden hat.</h1>
-		<p>
-			Hier liegen die Stücke, die lesbar genug geworden sind, um wiedergefunden zu werden:
-			Erkenntnisse, Ideen, Lebensnotizen und kleine Tagebuchspuren.
+	<header class="space-y-1">
+		<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Bibliothek</p>
+		<h1 class="text-lg font-medium tracking-tight text-foreground">Lesbare Stücke</h1>
+		<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
+			Einträge, die schon genug Form haben, um wiedergefunden zu werden.
 		</p>
-	</section>
+	</header>
 
-	{
-		sections.map((section) => (
-			<section class="section-block">
-				<div class="section-head">
-					<h2>{section.label}</h2>
-				</div>
+	<Separator />
 
-				<div class="row-list">
-					{
-						section.items.map((entry) => (
-							<EntryRow
-								href={entry.href}
-								title={entry.title}
-								summary={entry.summary}
-								date={entry.created}
-								bucket={entry.bucket}
-								kind={entry.kind}
-							/>
-						))
-					}
-				</div>
-			</section>
-		))
-	}
+	<div class="space-y-8">
+		{
+			sections.map((section) => (
+				<section class="space-y-3">
+					<div class="space-y-1">
+						<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+							{section.label}
+						</p>
+					</div>
+
+					<div class="divide-y">
+						{
+							section.items.map((entry) => (
+								<EntryRow
+									href={entry.href}
+									title={entry.title}
+									summary={entry.summary}
+									date={entry.created}
+									bucket={entry.bucket}
+									kind={entry.kind}
+								/>
+							))
+						}
+					</div>
+				</section>
+			))
+		}
+	</div>
 </Layout>

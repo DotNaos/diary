@@ -1,4 +1,5 @@
 ---
+import { Separator } from '@/components/ui/separator';
 import EntryRow from '../../components/EntryRow.astro';
 import Layout from '../../layouts/Layout.astro';
 import { getInboxPreviews } from '../../lib/content';
@@ -20,37 +21,42 @@ const sections = (['spark', 'fragment', 'question', 'seed'] as const)
 	description="Rohes Material, frühe Gedanken, Fragen und halbe Funde."
 	active="inbox"
 >
-	<section class="page-hero">
-		<p class="eyebrow">Inbox</p>
-		<h1>Hier darf es unfertig bleiben.</h1>
-		<p>
-			Die Inbox ist kein Archiv, sondern die Oberfläche für Material im Rohzustand. Eher
-			Zettelkasten als fertiges Notizbuch.
+	<header class="space-y-1">
+		<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Inbox</p>
+		<h1 class="text-lg font-medium tracking-tight text-foreground">Rohmaterial</h1>
+		<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
+			Gedanken, Fragen und Fragmente, die noch keine fertige Form brauchen.
 		</p>
-	</section>
+	</header>
 
-	{
-		sections.map((section) => (
-			<section class="section-block">
-				<div class="section-head">
-					<h2>{section.label}</h2>
-				</div>
+	<Separator />
 
-				<div class="row-list">
-					{
-						section.items.map((entry) => (
-							<EntryRow
-								href={entry.href}
-								title={entry.title}
-								summary={entry.summary}
-								date={entry.created}
-								bucket={entry.bucket}
-								kind={entry.kind}
-							/>
-						))
-					}
-				</div>
-			</section>
-		))
-	}
+	<div class="space-y-8">
+		{
+			sections.map((section) => (
+				<section class="space-y-3">
+					<div class="space-y-1">
+						<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+							{section.label}
+						</p>
+					</div>
+
+					<div class="divide-y">
+						{
+							section.items.map((entry) => (
+								<EntryRow
+									href={entry.href}
+									title={entry.title}
+									summary={entry.summary}
+									date={entry.created}
+									bucket={entry.bucket}
+									kind={entry.kind}
+								/>
+							))
+						}
+					</div>
+				</section>
+			))
+		}
+	</div>
 </Layout>

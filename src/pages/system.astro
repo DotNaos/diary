@@ -1,4 +1,6 @@
 ---
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import Layout from '../layouts/Layout.astro';
 ---
 
@@ -7,61 +9,69 @@ import Layout from '../layouts/Layout.astro';
 	description="Wie Inbox, Bibliothek, GitHub und ein späterer Agent zusammenarbeiten sollen."
 	active="system"
 >
-	<section class="page-hero">
-		<p class="eyebrow">System</p>
-		<h1>Die Architektur ist absichtlich schlicht.</h1>
-		<p>
-			Die Daten liegen als Markdown im Repository. Das Frontend liest nur. Die spätere Logik
-			soll flüchtig bleiben: serverlos, klein und austauschbar.
+	<header class="space-y-1">
+		<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">System</p>
+		<h1 class="text-lg font-medium tracking-tight text-foreground">Schlicht aufgebaut</h1>
+		<p class="max-w-2xl text-sm leading-6 text-muted-foreground">
+			Der dauerhafte Speicher bleibt im Repository. Alles andere darf flüchtig bleiben.
 		</p>
-	</section>
+	</header>
 
-	<section class="section-block">
-		<div class="timeline-grid">
-			<article class="timeline-card">
-				<p class="mini-label">1. GitHub</p>
-				<h2>Das Regal</h2>
-				<p>
-					Alles Wichtige lebt direkt im Repository: Inbox-Einträge, Bibliothek, Verlauf und
-					Versionen.
-				</p>
-			</article>
+	<Separator />
 
-			<article class="timeline-card">
-				<p class="mini-label">2. Astro</p>
-				<h2>Die Lesefläche</h2>
-				<p>
-					Das Frontend ist darauf optimiert, Dinge schnell wiederzufinden, lesbar zu machen
-					und nicht im Weg zu stehen.
-				</p>
-			</article>
+	<section class="space-y-4">
+		<div class="space-y-3">
+			<div class="flex items-start gap-3">
+				<Badge variant="outline" className="mt-0.5 rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
+					1
+				</Badge>
+				<div class="space-y-1">
+					<h2 class="text-sm font-medium tracking-tight text-foreground">GitHub hält die Dateien</h2>
+					<p class="text-sm leading-6 text-muted-foreground">
+						Inbox und Bibliothek liegen als Markdown direkt im Repo.
+					</p>
+				</div>
+			</div>
 
-			<article class="timeline-card">
-				<p class="mini-label">3. Vercel</p>
-				<h2>Flüchtige Dienste</h2>
-				<p>
-					Später kann Vercel serverlos Inbox-Eingänge annehmen oder einen Kurationslauf
-					anstossen, ohne selbst dauerhafter Speicher zu werden.
-				</p>
-			</article>
-		</div>
-	</section>
+			<div class="flex items-start gap-3">
+				<Badge variant="outline" className="mt-0.5 rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
+					2
+				</Badge>
+				<div class="space-y-1">
+					<h2 class="text-sm font-medium tracking-tight text-foreground">Astro liest nur</h2>
+					<p class="text-sm leading-6 text-muted-foreground">
+						Das Frontend ist vor allem eine ruhige Lesefläche und Navigation.
+					</p>
+				</div>
+			</div>
 
-	<section class="section-block">
-		<div class="section-head">
-			<div>
-				<p class="eyebrow">Späterer Agent</p>
-				<h2>Der geplante Lauf in einem Satz</h2>
+			<div class="flex items-start gap-3">
+				<Badge variant="outline" className="mt-0.5 rounded-md px-1.5 py-0 text-[10px] text-muted-foreground">
+					3
+				</Badge>
+				<div class="space-y-1">
+					<h2 class="text-sm font-medium tracking-tight text-foreground">Vercel bleibt flüchtig</h2>
+					<p class="text-sm leading-6 text-muted-foreground">
+						Später kann dort ein Inbox-Eingang oder ein kleiner Kurationslauf laufen, ohne selbst das Archiv zu sein.
+					</p>
+				</div>
 			</div>
 		</div>
+	</section>
 
-		<div class="info-panel">
-			<ul class="flow-list">
-				<li><strong>lesen</strong><span>einen rohen Inbox-Eintrag aus GitHub holen</span></li>
-				<li><strong>formen</strong><span>inhaltlich klären, Titel und Tags vorschlagen</span></li>
-				<li><strong>einordnen</strong><span>als Bibliothekseintrag zurück ins Repo schreiben</span></li>
-				<li><strong>markieren</strong><span>den ursprünglichen Inbox-Zettel als verarbeitet kennzeichnen</span></li>
-			</ul>
+	<Separator />
+
+	<section class="space-y-3">
+		<div class="space-y-1">
+			<p class="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Agent</p>
+			<h2 class="text-base font-medium tracking-tight text-foreground">Geplanter Lauf</h2>
 		</div>
+
+		<ol class="space-y-3 pl-5 text-sm leading-6 text-muted-foreground">
+			<li>einen rohen Inbox-Eintrag lesen</li>
+			<li>ihn sprachlich klären und einordnen</li>
+			<li>als Bibliothekseintrag zurück ins Repo schreiben</li>
+			<li>den ursprünglichen Zettel als verarbeitet markieren</li>
+		</ol>
 	</section>
 </Layout>

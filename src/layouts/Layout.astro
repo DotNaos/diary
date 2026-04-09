@@ -1,5 +1,9 @@
 ---
 import AgentationToolbar from '../components/AgentationToolbar';
+import { buttonVariants } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import { withBase } from '@/lib/paths';
 import '../styles/global.css';
 
 interface Props {
@@ -29,62 +33,63 @@ const navigation = [
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
-			rel="stylesheet"
-		/>
+		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+		<link rel="icon" href={withBase('/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<title>{pageTitle}</title>
 	</head>
 	<body>
-		<div class="page-surface">
-			<div class="app-shell">
-				<aside class="sidebar">
-					<a class="brand sidebar-brand" href="/">
-						<span class="brand-mark">D</span>
-						<span>
-							<strong>Diary</strong>
-							<small>markdown library</small>
-						</span>
-					</a>
-
-					<nav class="sidebar-nav" aria-label="Hauptnavigation">
-						{
-							navigation.map((item) => (
-								<a
-									href={item.href}
-									class:list={['sidebar-link', active === item.key && 'is-active']}
-								>
-									{item.label}
-								</a>
-							))
-						}
-					</nav>
-
-					<div class="sidebar-note">
-						<p class="eyebrow">Markdown</p>
-						<code>src/content/inbox</code>
-						<code>src/content/library</code>
-					</div>
-				</aside>
-
-				<div class="content-shell">
-					<main class="page-content">
-						<slot />
-					</main>
-
-					<footer class="footer-note">
-						<p>GitHub ist das Regal. Astro ist nur die ruhige Leseschicht darüber.</p>
-					</footer>
+		<div class="mx-auto grid min-h-screen w-full max-w-6xl gap-8 px-4 py-5 sm:px-6 lg:grid-cols-[10.5rem_minmax(0,1fr)] lg:px-8">
+			<aside class="flex flex-col gap-5 lg:sticky lg:top-6 lg:h-fit">
+				<div class="space-y-1">
+					<a href={withBase('/')} class="text-sm font-medium tracking-tight text-foreground">Diary</a>
+					<p class="text-xs leading-5 text-muted-foreground">
+						Markdown, leise lesbar gemacht.
+					</p>
 				</div>
-			</div>
 
-			<AgentationToolbar client:only="react" />
+				<nav class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-1" aria-label="Hauptnavigation">
+					{
+						navigation.map((item) => (
+							<a
+								href={withBase(item.href)}
+								class={cn(
+									buttonVariants({
+										variant: active === item.key ? 'secondary' : 'ghost',
+										size: 'sm',
+									}),
+									'justify-start rounded-md px-3 text-muted-foreground',
+									active === item.key && 'text-foreground',
+								)}
+							>
+								{item.label}
+							</a>
+						))
+					}
+				</nav>
+
+				<div class="hidden lg:block">
+					<Separator className="mb-4" />
+					<div class="space-y-2">
+						<p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Markdown</p>
+						<p class="text-xs text-muted-foreground">src/content/inbox</p>
+						<p class="text-xs text-muted-foreground">src/content/library</p>
+					</div>
+				</div>
+			</aside>
+
+			<div class="min-w-0">
+				<main class="space-y-10">
+					<slot />
+				</main>
+
+				<footer class="mt-10 border-t pt-4 text-xs text-muted-foreground">
+					GitHub ist das Regal. Astro ist nur die Leseschicht.
+				</footer>
+			</div>
 		</div>
+
+		<AgentationToolbar client:only="react" />
 	</body>
 </html>
